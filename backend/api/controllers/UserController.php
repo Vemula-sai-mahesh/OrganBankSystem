@@ -1,61 +1,71 @@
 <?php
+
 namespace App\Controllers;
 
 use App\Models\User;
-use PDO;
 use PDOException;
+use App\Models\UserRole;
 
-class UserController
+class UserController extends BaseController
 {
-    private PDO $db;
+    
 
-    public function __construct(PDO $db)
+    public function __construct()
     {
-        $this->db = $db;
     }
 
-    public function index(): void
+    public function index()
     {
         try {
-            $search = $_GET['search'] ?? null;            
+            $search = $_GET['search'] ?? null;
             $filter = filter_input(INPUT_GET, 'filter', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY) ?? null;
             $sort = $_GET['sort'] ?? null;
-            $page = $_GET['page'] ?? null;
+            $page = $_GET['page'] ?? 1;
             $per_page = $_GET['per_page'] ?? null;
+
             if ($sort) {
                 $direction = $_GET['direction'] ?? null;
                 if (!$direction) {
-                    echo json_encode(['error' => 'Direction is required when sort is provided']);
-                    http_response_code(400);
+                    $this->sendErrorResponse('Direction is required when sort is provided', 400);
+                    return;
+                }
+                if (!in_array(strtolower($direction), ['asc', 'desc'])) {
+                    $this->sendErrorResponse("Invalid direction: $direction", 400);
                     return;
                 }
                 $sort .= "&" . $direction;
             }
-            $users = User::getAll($this->db, $search, $filter, $sort, $page, $per_page);
-            $users = User::getAll($this->db, $search, $filter, $sort);
+            $users = User::getAll($search, $filter, $sort, $page, $per_page);
             echo json_encode($users);
-        } catch (PDOException $e) {
-            echo json_encode(['error' => $e->getMessage()]);
-            http_response_code(500);
+        } catch (\Exception $e) {
+            $this->sendErrorResponse('Database error during users get.');
         }
     }
 
-    public function store(): void
+    public function show(string $id)
+    {
+        try {
+            $user = User::getById($id);
+            if ($user) {
+                $this->sendJsonResponse($user);
+            } else {
+                $this->sendErrorResponse('User not found', 404);
+            }
+        } catch (PDOException $e) {
+            $this->sendErrorResponse('Database error during user get.');
+        }
+    }
+
+    public function store()
     {
         $data = json_decode(file_get_contents('php://input'), true);
 
         // Validate required fields
         if (empty($data['email']) || empty($data['password']) || empty($data['first_name']) || empty($data['last_name'])) {
-            echo json_encode(['error' => 'Missing required fields']);
-            http_response_code(400);
+            $this->sendErrorResponse('Missing required fields', 400);
             return;
         }
 
-        // Validate email format
-        if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-            echo json_encode(['error' => 'Invalid email format']);
-            http_response_code(400);
-            return;
         }
 
         // Validate password length
@@ -64,139 +74,85 @@ class UserController
             http_response_code(400);
             return;
         }
-
-        if ($this->emailExists($data['email'])) {
-            echo json_encode(['error' => 'Email already exists']);
-            http_response_code(409);
+        if (User::emailExists($data['email'])) {
+            $this->sendErrorResponse('User with this email already exists', 409);
             return;
         }
 
-        $user = new User($this->db);
-        $user->setId(uniqid());
+        $user = new User();
+        $user->setTable('users');
+        $user->setId($data['id'] ?? uniqid());
         $user->setEmail($data['email']);
-        $user->setPassword($data['password']);
+        $user->setPassword($data['password']); 
         $user->setFirstName($data['first_name']);
         $user->setLastName($data['last_name']);
-
-        // Initialize optional fields to null
         $user->setPhoneNumber($data['phone_number'] ?? null);
         $user->setStreetAddress($data['street_address'] ?? null);
         $user->setCity($data['city'] ?? null);
         $user->setStateProvince($data['state_province'] ?? null);
         $user->setCountry($data['country'] ?? null);
         $user->setPostalCode($data['postal_code'] ?? null);
-        $user->setDateOfBirth($data['date_of_birth'] ?? null);
-        $user->setGender($data['gender'] ?? null);
-        $user->setPreferredLanguage($data['preferred_language'] ?? null);
-        $user->setProfilePictureUrl($data['profile_picture_url'] ?? null);
-        // emailVerified defaults to false in constructor
 
         try {
-            $userId = $user->create();
-            ob_end_clean(); // Clear buffer before final output
-            echo json_encode(['message' => 'User created', 'id' => $userId]);
-            http_response_code(201);
+            $userRole = new UserRole();
+            $userRole->setTable('user_roles');
+            $userRole->setUserId($user->getId());
+            $userRole->setOrganizationId($data['organization_id']);
+            $userRole->setRoleName($data['role_name']);
+            $userRole->create();
+
+            $user->create();
+            $this->sendJsonResponse(['message' => 'User created', 'id' => $user->getId()], 201);
         } catch (PDOException $e) {
-            // Let index.php handle logging/generic response
-            // If we get here, clear buffer and send specific error
-            ob_end_clean(); 
-            echo json_encode(['error' => 'Database error during user creation.']); 
-            http_response_code(500);
+            $this->sendErrorResponse('Database error during user creation.');
         }
     }
 
-    public function update(string $id): void
+    public function update(string $id)
     {
         $data = json_decode(file_get_contents('php://input'), true);
+        $user = User::getById($id);
+        if (!$user) {
+            $this->sendErrorResponse('User not found', 404);
+        }
 
-        // Validate email format if provided
         if (isset($data['email']) && !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-            ob_end_clean();
-            echo json_encode(['error' => 'Invalid email format']);
-            http_response_code(400);
+            $this->sendErrorResponse('Invalid email format', 400);
             return;
         }
 
-        // Validate password length if provided
         if (isset($data['password']) && strlen($data['password']) < 8) {
-            ob_end_clean();
-            echo json_encode(['error' => 'Password must be at least 8 characters long']);
-            http_response_code(400);
+            $this->sendErrorResponse('Password must be at least 8 characters long', 400);
             return;
         }
-
-        $user = new User($this->db);
-        $user->setId($id);
-
         try {
-            if (!$user->update($data)) {
-                ob_end_clean();
-                echo json_encode(['error' => 'User not found or no changes made']);
-                http_response_code(404); // Or 200 if no changes is ok
-                return;
-            }
-            ob_end_clean();
-            echo json_encode(['message' => 'User updated']);
-            http_response_code(200);
+            $user->update($id, $data);
+            $this->sendJsonResponse(['message' => 'User updated']);
         } catch (PDOException $e) {
-            ob_end_clean();
-            echo json_encode(['error' => 'Database error during user update.']);
-            http_response_code(500);
+            $this->sendErrorResponse('Database error during user update.', 500);
         }
     }
 
-    public function delete(string $id): void
-    {
-        $user = new User($this->db);
-        $user->setId($id);
+       public function delete(string $id)
+    {   
+
+        $user = User::getById($id);
+
+        if (!$user) {
+            $this->sendErrorResponse('User not found', 404);
+            return;
+        }
+        if (!$user->delete($id)) {
+            return;
+        }
         try {
             if (!$user->delete()) {
-                ob_end_clean();
-                echo json_encode(['error' => 'User not found']);
-                http_response_code(404);
+                $this->sendErrorResponse('User not found', 404);
                 return;
             }
-            ob_end_clean();
-            echo json_encode(['message' => 'User deleted']);
-            http_response_code(200);
+            $this->sendJsonResponse(['message' => 'User deleted']);
         } catch (PDOException $e) {
-            ob_end_clean();
-            echo json_encode(['error' => 'Database error during user deletion.']);
-            http_response_code(500);
-        }
-    }
-
-    public function setAdmin(string $id): void
-    {
-        $user = new User($this->db);
-        $user->setId($id);
-        try {
-            // Assuming update method handles 'is_admin' flag
-            if (!$user->update(['is_admin' => 1])) { 
-                ob_end_clean();
-                echo json_encode(['error' => 'User not found or could not be updated']);
-                http_response_code(404); // Or 500
-                return;
-            }
-            ob_end_clean();
-            echo json_encode(['message' => 'User updated as admin']);
-            http_response_code(200);
-        } catch (PDOException $e) {
-            ob_end_clean();
-            echo json_encode(['error' => 'Database error setting user as admin.']);
-            http_response_code(500);
-        }
-    }
-
-    private function emailExists(string $email): bool
-    {
-        try {
-            $stmt = $this->db->prepare("SELECT COUNT(*) FROM users WHERE email = :email");
-            $stmt->bindValue(':email', $email);
-            $stmt->execute();
-            return $stmt->fetchColumn() > 0;
-        } catch (PDOException $e) {
-            throw new PDOException("Error checking if email exists: " . $e->getMessage());
+            $this->sendErrorResponse('Database error during user deletion.');
         }
     }
 }

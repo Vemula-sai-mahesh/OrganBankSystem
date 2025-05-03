@@ -1,31 +1,31 @@
 <?php
 
 namespace App\Models;
-
-use PDO;
+use App\Models\BaseModel;
 use PDOException;
 
-class Organization
+class Organization extends BaseModel
 {
+    protected string $table = 'organizations';
     private PDO $db;
     private string $id;
     private string $name;
     private ?string $type;
-    private ?string $streetAddress;
+    private ?string $street_address;
     private ?string $city;
     private ?string $stateProvince;
-    private ?string $country;
-    private ?string $postalCode;
+    private ?string $postal_code;
     private ?string $phoneNumber;
     private ?string $email;
     private ?string $websiteUrl;
     private bool $isActive;
     private ?string $createdAt;
     private ?string $updatedAt;
+    private $db;
 
-    public function __construct(PDO $db)
+    public function __construct(?PDO $db = null)
     {
-        $this->db = $db;
+        $this->db = $db ?? $this->getDb();
         $this->isActive = true;
     }
 
@@ -59,14 +59,14 @@ class Organization
         $this->type = $type;
     }
 
-    public function getStreetAddress(): ?string
+    public function getStreet_address(): ?string
     {
-        return $this->streetAddress;
+        return $this->street_address;
     }
 
-    public function setStreetAddress(?string $streetAddress): void
+    public function setStreet_address(?string $street_address): void
     {
-        $this->streetAddress = $streetAddress;
+        $this->street_address = $street_address;
     }
 
     public function getCity(): ?string
@@ -89,24 +89,14 @@ class Organization
         $this->stateProvince = $stateProvince;
     }
 
-    public function getCountry(): ?string
+    public function getPostal_code(): ?string
     {
-        return $this->country;
+        return $this->postal_code;
     }
 
-    public function setCountry(?string $country): void
+    public function setPostal_code(?string $postal_code): void
     {
-        $this->country = $country;
-    }
-
-    public function getPostalCode(): ?string
-    {
-        return $this->postalCode;
-    }
-
-    public function setPostalCode(?string $postalCode): void
-    {
-        $this->postalCode = $postalCode;
+        $this->postal_code = $postal_code;
     }
 
     public function getPhoneNumber(): ?string
@@ -119,9 +109,9 @@ class Organization
         $this->phoneNumber = $phoneNumber;
     }
 
-    public function getEmail(): ?string
+    public function getEmail(): string
     {
-        return $this->email;
+        return $this->email ?? '';
     }
 
     public function setEmail(?string $email): void
@@ -169,48 +159,75 @@ class Organization
         $this->updatedAt = $updatedAt;
     }
 
-    public function create(): string
+    public function create(): bool
     {
         try {
-            $stmt = $this->db->prepare("INSERT INTO organizations (id, name, type, street_address, city, state_province, country, postal_code, phone_number, email, website_url, is_active) VALUES (:id, :name, :type, :street_address, :city, :state_province, :country, :postal_code, :phone_number, :email, :website_url, :is_active)");
-            $stmt->bindValue(':id', $this->id);
-            $stmt->bindValue(':name', $this->name);
-            $stmt->bindValue(':type', $this->type);
-            $stmt->bindValue(':street_address', $this->streetAddress);
-            $stmt->bindValue(':city', $this->city);
-            $stmt->bindValue(':state_province', $this->stateProvince);
-            $stmt->bindValue(':country', $this->country);
-            $stmt->bindValue(':postal_code', $this->postalCode);
-            $stmt->bindValue(':phone_number', $this->phoneNumber);
-            $stmt->bindValue(':email', $this->email);
-            $stmt->bindValue(':website_url', $this->websiteUrl);
-            $stmt->bindValue(':is_active', $this->isActive, PDO::PARAM_BOOL);
-            $stmt->execute();
-
-            return $this->id;
+            $query = "INSERT INTO organizations (id, name, type, street_address, city, state_province, country, postal_code, phone_number, email, website_url, is_active) 
+                      VALUES (:id, :name, :type, :street_address, :city, :state_province, :country, :postal_code, :phone_number, :email, :website_url, :is_active)";            
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([
+                ':id' => $this->id,
+                ':name' => $this->name,
+                ':type' => $this->type,
+                ':street_address' => $this->streetAddress,
+                ':city' => $this->city,
+                ':state_province' => $this->state_province,
+                ':postal_code' => $this->postal_code,
+                ':phone_number' => $this->phoneNumber,
+                ':email' => $this->email,
+                ':website_url' => $this->websiteUrl,
+                ':is_active' => $this->isActive,
+            ]);
+            return $stmt->rowCount() > 0;
         } catch (PDOException $e) {
-            throw new PDOException("Error creating organization: " . $e->getMessage());
+            error_log("Error creating organization: " . $e->getMessage());
+            return false;
         }
     }
 
-    public function update(array $data): bool
+    public static function getById(PDO $db, string $id): ?Organization
     {
         try {
-            foreach ($data as $key => $value) {
-                $setter = 'set' . str_replace('_', '', ucwords($key, '_'));
-                if (method_exists($this, $setter)) {
-                    $this->$setter($value);
+            $stmt = $db->prepare("SELECT * FROM organizations WHERE id = :id");
+            $stmt->execute([':id' => $id]);
+            $organizationData = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($organizationData) {
+                $organization = new Organization();
+                foreach ($organizationData as $key => $value) {
+                    $setter = 'set' . str_replace('_', '', ucwords($key, '_'));
+                    if (method_exists($organization, $setter)) {
+                        $organization->$setter($value);
+                    }
                 }
+                return $organization;
             }
-            $stmt = $this->db->prepare("UPDATE organizations SET name = :name, type = :type, email = :email, website_url = :website_url, phone_number = :phone_number WHERE id = :id");
-            $stmt->bindValue(':id', $this->id);
-            $stmt->bindValue(':name', $this->name);
-            $stmt->bindValue(':type', $this->type);
-            $stmt->bindValue(':email', $this->email);
-            $stmt->bindValue(':website_url', $this->websiteUrl);
-            $stmt->bindValue(':phone_number', $this->phoneNumber);
-            return $stmt->execute();
+            return null;
         } catch (PDOException $e) {
+            error_log("Error getting organization by ID: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    public function update(): bool
+    {
+        try {
+            $query = "UPDATE organizations SET name = :name, type = :type, street_address = :street_address, city = :city, state_province = :state_province,  postal_code = :postal_code, phone_number = :phone_number, email = :email, website_url = :website_url, is_active = :is_active WHERE id = :id";
+            $stmt = $this->db->prepare($query);
+            return $stmt->execute([
+                ':name' => $this->name,
+                ':type' => $this->type,
+                ':street_address' => $this->streetAddress,
+                ':city' => $this->city,
+                ':state_province' => $this->state_province,
+                ':postal_code' => $this->postal_code,
+                ':phone_number' => $this->phoneNumber,
+                ':email' => $this->email,
+                ':website_url' => $this->websiteUrl,
+                ':is_active' => $this->isActive,
+                ':id' => $this->id,
+            ]);
+        } catch (PDOException $e) {
+            error_log("Error updating organization: " . $e->getMessage());
             return false;
         }
     }
@@ -219,9 +236,9 @@ class Organization
     {
         try {
             $stmt = $this->db->prepare("DELETE FROM organizations WHERE id = :id");
-            $stmt->bindValue(':id', $this->id);
-            return $stmt->execute();
+            return $stmt->execute([':id' => $this->id]);
         } catch (PDOException $e) {
+            error_log("Error deleting organization: " . $e->getMessage());
             return false;
         }
     }
@@ -291,5 +308,4 @@ class Organization
             return [];
         }
     }
-    
 }

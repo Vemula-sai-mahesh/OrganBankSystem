@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="../styles/style.css">
+</head>
+<body>
+    <main>
+        <section id="profile-content">
+            <h2>User Profile</h2>
+            <div id="user-info">
+                <form id="profile-form">
+                    <label for="first_name">First Name:</label>
+                    <input type="text" id="first_name" name="first_name" required><br><br>
+
+                    <label for="last_name">Last Name:</label>
+                    <input type="text" id="last_name" name="last_name" required><br><br>
+
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required><br><br>
+
+                    <label for="phone_number">Phone Number:</label>
+                    <input type="tel" id="phone_number" name="phone_number"><br><br>
+
+                    <button type="submit">Update Profile</button>
+                </form>
+            </div>
+
+            <div id="donation-intent">
+                <h3>Donation Intent</h3>
+                <p>Manage your organ donation intent here.</p>
+                <form id="intent-form">
+                    <label for="organ_type">Organ Type:</label>
+                    <select id="organ_type" name="organ_type">
+                        </select><br><br>
+                    <button type="button" id="declare-intent">Declare Intent</button>
+                    <button type="button" id="revoke-intent">Revoke Intent</button>
+                </form>
+                <button type="button" id="generate-pdf">Generate PDF</button>
+            </div>
+        </section>
+    </main>
+    <script type="module" src="../scripts/app.js"></script>
+    <script type="module" src="donor.js"></script>
+</body>
+</html>

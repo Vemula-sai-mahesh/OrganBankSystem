@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Transplant Outcome</title>
+    <link rel="stylesheet" href="../styles/style.css">
+</head>
+<body>
+    <main>
+        <h1>Log Transplant Outcome</h1>
+        <form id="transplantOutcomeForm">
+            <div class="form-group">
+                <label for="organId">Organ ID:</label>
+                <input type="text" id="organId" name="organId" required>
+            </div>
+            <div class="form-group">
+                <label for="recipientId">Recipient External ID:</label>
+                <input type="text" id="recipientId" name="recipientId" required>
+            </div>
+            <div class="form-group">
+                <label for="transplantCenterId">Transplant Center ID:</label>
+                <input type="text" id="transplantCenterId" name="transplantCenterId" required>
+            </div>
+            <div class="form-group">
+                <label for="transplantTimestamp">Transplant Timestamp:</label>
+                <input type="datetime-local" id="transplantTimestamp" name="transplantTimestamp" required>
+            </div>
+            <div class="form-group">
+                <label for="outcome">Outcome:</label>
+                <select id="outcome" name="outcome" required>
+                    <option value="">Select Outcome</option>
+                    <option value="Successful">Successful</option>
+                    <option value="Failed">Failed</option>
+                    <option value="Pending Evaluation">Pending Evaluation</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="notes">Notes:</label>
+                <textarea id="notes" name="notes" rows="4"></textarea>
+            </div>
+            <button type="submit">Submit Outcome</button>
+        </form>
+    </main>
+    <script src="../scripts/app.js"></script>
+</body>
+</html>

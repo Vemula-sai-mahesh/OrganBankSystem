@@ -1,24 +1,26 @@
-php
 <?php
 
-namespace App\Controllers;
+namespace OrganBankSystem\backend\api\Controllers;
 
-use App\Models\Organization;
+use OrganBankSystem\backend\Models\Organization;
+use OrganBankSystem\backend\Models\UserRole;
 use PDO;
+use OrganBankSystem\backend\api\Controllers\BaseController;
 
-class OrganizationController
+class OrganizationController extends BaseController
 {
-    private PDO $db;
+    private $db;
 
     public function __construct(PDO $db)
     {
-        $this->db = $db;
+      $this->db = $db;
     }
-
+    
     public function index(): void
     {
         try {
             $search = $_GET['search'] ?? null; 
+
             $filter = filter_input(INPUT_GET, 'filter', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY) ?? null;
             $sort = $_GET['sort'] ?? null;
             $direction = $_GET['direction'] ?? null;
@@ -29,28 +31,49 @@ class OrganizationController
                 echo json_encode(['error' => 'Direction is required when sort is provided']);
                 http_response_code(400);
                 return;
-            }
-            $organizations = Organization::getAll($this->db, $search, $filter, $sort . "&" . $direction, $page, $per_page);
+            }$organizations = Organization::getAll($this->db, $search, $filter, $sort, $direction, $page, $per_page);
+            
             echo json_encode($organizations);
+            http_response_code(200);
         } catch (\PDOException $e) {
             echo json_encode(['error' => $e->getMessage()]);
             http_response_code(500);
         }
     }
-
-    public function store(): void
+    
+    public function show(string $id): void
     {
-        $data = json_decode(file_get_contents('php://input'), true);
+         try {
+                $organization = new Organization($this->db);
+                $orgData = $organization->getById($id);
+    
+                if (!$orgData) {
+                    http_response_code(404);
+                    echo json_encode(['error' => 'Organization not found']);
+                    return;
+                }
 
-        // Validate data
+            http_response_code(200);
+            echo json_encode($orgData);
+        } catch (\PDOException $e) {
+            http_response_code(500);
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+    }
+    public function store(): void
+    { 
+        $data = json_decode(file_get_contents('php://input'), true);
+        
         if (empty($data['name'])) {
             echo json_encode(['error' => 'Name is required']);
             http_response_code(400);
             return;
         }
 
-        if (empty($data['type'])) {
-            echo json_encode(['error' => 'Type is required']);
+        if (empty($data['type'])) { 
+            echo json_encode(['error' => 'Type is required']);   
+            http_response_code(400);
+            return;
             http_response_code(400);
             return;
         }
@@ -66,17 +89,17 @@ class OrganizationController
             http_response_code(400);
             return;
         }
+        
         $stmt = $this->db->prepare("SELECT id FROM organizations WHERE name = :name");
         $stmt->execute(['name' => $data['name']]);
         if ($stmt->fetch()) {
             echo json_encode(['error' => 'Organization with the same name already exists']);
-            http_response_code(409);
+            http_response_code(409); 
+            return;
         }
+        
 
         $organization = new Organization($this->db);
-        $organization->setId(uniqid());
-        $organization->setName($data['name']);
-        $organization->setType($data['type']);
         $organization->setStreetAddress($data['street_address'] ?? null);
         $organization->setCity($data['city'] ?? null);
         $organization->setStateProvince($data['state_province'] ?? null);
@@ -85,21 +108,20 @@ class OrganizationController
         $organization->setPhoneNumber($data['phone_number'] ?? null);
         $organization->setEmail($data['email'] ?? null);
         $organization->setWebsiteUrl($data['website_url'] ?? null);
-
+        $organization->setName($data['name']);
+        $organization->setType($data['type']);
         try {
             $organizationId = $organization->create();
-            echo json_encode(['message' => 'Organization created', 'id' => $organizationId]);
+            echo json_encode(['message' => 'Organization created', 'id' => $organizationId ]);
             http_response_code(201);
         } catch (\PDOException $e) {
             echo json_encode(['error' => $e->getMessage()]);
             http_response_code(500);
         }
     }
-
+    
     public function update(string $id): void
     {
-        $data = json_decode(file_get_contents('php://input'), true);
-
         // Validate data
         if (empty($data['name'])) {
             echo json_encode(['error' => 'Name is required']);
@@ -124,24 +146,25 @@ class OrganizationController
             http_response_code(400);
             return;
         }
-        $stmt = $this->db->prepare("SELECT id FROM organizations WHERE name = :name AND id != :id");
-        $stmt->execute(['name' => $data['name'], 'id' => $id]);
-        if ($stmt->fetch()) {
-            echo json_encode(['error' => 'Organization with the same name already exists']);
-            http_response_code(409);
-            return;
-        }
-
+    
+        $data = json_decode(file_get_contents('php://input'), true);
         $organization = new Organization($this->db);
-        $organization->setId($id);
-        
-        $stmt = $this->db->prepare("SELECT id FROM organizations WHERE id = :id");
-        $stmt->execute(['id' => $id]);
-        if (!$stmt->fetch()) {
+    
+        // Check if organization exists
+        $organizationData = $organization->getById($id);
+        if (!$organizationData) {
             echo json_encode(['error' => 'Organization not found']);
             http_response_code(404);
             return;
         }
+    
+        $organization->setId($id);
+        $organization->setName($data['name'] ?? $organizationData['name']);
+        $organization->setType($data['type'] ?? $organizationData['type']);
+        $organization->setStreetAddress($data['street_address'] ?? $organizationData['street_address']);
+        $organization->setCity($data['city'] ?? $organizationData['city']);
+        $organization->setStateProvince($data['state_province'] ?? $organizationData['state_province']);
+        $organization->setCountry($data['country'] ?? $organizationData['country']);
         $updated = $organization->update($data);
         
         if ($updated) {
@@ -149,15 +172,25 @@ class OrganizationController
             http_response_code(200);
         }
     }
-    
-    public function delete(string $id): void{
+
+    public function delete(string $id): void
+    {
         $organization = new Organization($this->db);
-        if(!$organization->delete($id)){
-            echo json_encode(['error' => 'Organization not found']);
-            http_response_code(404);
-            return;
-        }
-        echo json_encode(['message' => 'Organization deleted']);
-        http_response_code(200);
+        try {
+            // Check if the organization exists
+            $orgData = $organization->getById($id);
+            if (!$orgData) {
+                http_response_code(404);
+                echo json_encode(['error' => 'Organization not found']);
+                return;
+            }
+    
+            $organization->delete();
+            echo json_encode(['message' => 'Organization deleted', "id" => $id]);
+            http_response_code(200);
+        } catch (\PDOException $e) {
+            http_response_code(500);
+            echo json_encode(['error' => $e->getMessage()]);
+        }   
     }
 }

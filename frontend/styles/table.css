@@ -1,37 +1,101 @@
-/* Table styles */
+/* Table styles */ /* Main table container */
 table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #fff;
 }
 
-th,
-td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
+/* Table header styles */
+thead {
+  background-color: #3f51b5; /* Primary color for header background */
+  color: #fff; /* White text for contrast */
+  text-transform: uppercase; /* Uppercase for emphasis */
 }
 
 th {
-    background-color: #f2f2f2;
+  font-weight: 600;
+  text-align: left;
+  padding: 14px 18px;
+  border-bottom: 2px solid #2c387e; /* Darker blue for header border */
 }
+
+/* Table body styles */
+tbody {
+  border-top: 1px solid #e0e0e0; /* Light gray border for separation */
+}
+
+tbody tr {
+  transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f9f9f9; /* Light gray for even rows */
+}
+
+tbody tr:hover {
+  background-color: #e8e8e8; /* Slightly darker gray on hover */
+}
+
+td {
+  border-bottom: 1px solid #e0e0e0; /* Light gray border between rows */
+  padding: 14px 18px;
+  font-size: 15px;
+  text-align: left;
+}
+
+/* Table container */
+.table-container {
+  overflow-x: auto; /* Horizontal scroll if table is too wide */
+  margin-bottom: 20px;
+}
+
+/* Button styles */ /* General button styles */
+.view-details,
+.edit-button,
+.delete-button,
+.create-button,
+.set-admin-button {
+  border: none; /* Remove default border */
+  color: white;
+  padding: 9px 16px;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-left: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+}
+
+/* Specific button colors */
 .view-details {
-    margin-left: 10px;
-    background-color: #008CBA;
+  background-color: #008cba; /* Blue */
 }
 
 .edit-button {
-    background-color: #FFC107;
-    margin-left: 10px;
+  background-color: #ffc107; /* Yellow */
 }
 
 .delete-button {
-    background-color: #f44336;
-    margin-left: 10px;
+  background-color: #f44336;
 }
-.create-button{
-    background-color: #008CBA;
+.create-button {
+  background-color: #008cba;
 }
-.set-admin-button{
-    background-color: #9400d3;
+
+.set-admin-button {
+  background-color: #9400d3;
+}
+
+/* Media query for responsiveness */
+@media (max-width: 768px) {
+  td,
+  th {
+    padding: 10px; /* Reduce padding for smaller screens */
+  }
 }

@@ -1,34 +1,118 @@
-.form-modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    padding: 20px;
-    border: 1px solid black;
-    z-index: 1000;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+.modal {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001; /* Ensure it's above other content */
+  opacity: 0; /* Initially hidden */
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-.form-modal input, .form-modal textarea {
-    display: block;
-    margin: 10px 0;
-    padding: 5px;
-    width: 300px;
-}
-.form-modal select {
-    display: block;
-    margin: 10px 0;
-    padding: 5px;
-    width: 300px;
+.modal.show {
+  opacity: 1; /* Fade in */
+  visibility: visible;
 }
 
-.form-modal button {
-    display: inline-block;
-    margin: 10px 5px 0 0;
+.modal-content {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  max-width: 600px;
+  width: 95%; /* Responsive width */
+  position: relative;
 }
 
-.form-modal label {
-    display: block;
-    margin: 10px 0 0 0;
+.modal h2 {
+  margin-top: 0;
+  color: #2c3e50; /* Darker text for better readability */
+  font-size: 1.75rem;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #ecf0f1;
+  padding-bottom: 10px;
 }
+
+.modal label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #34495e; /* Darker label text */
+}
+
+.modal input[type="text"],
+.modal input[type="email"],
+.modal input[type="password"],
+.modal select,
+.modal textarea {    
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 20px;
+  border: 1px solid #bdc3c7;
+  border-radius: 6px;
+  box-sizing: border-box; /* Include padding and border */
+  transition: border-color 0.3s ease;
+}
+
+.modal input[type="text"]:focus,
+.modal input[type="email"]:focus,
+.modal input[type="password"]:focus,
+.modal select:focus,
+.modal textarea:focus {
+  border-color: #3498db; /* Highlight color on focus */
+  outline: none; /* Remove the default focus outline */
+}
+
+.modal select {
+  appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z" fill="%23777"/></svg>');
+  background-position: right 10px center;
+  background-repeat: no-repeat;
+  padding-right: 30px; /* Extra space for the dropdown arrow */
+  cursor: pointer;
+}
+
+.modal textarea {
+    min-height: 100px;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modal button,
+.close-button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.modal button {
+  background-color: #27ae60; /* Success color */
+  color: white;
+}
+
+.modal button:hover {
+    background-color: #219653;
+}
+
+.close-button {
+  background-color: #c0392b; /* Danger color */
+}
+
+.close-button:hover {
+    background-color: #a93025;
+}
+

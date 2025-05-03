@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Information - OrganBank System</title>
+    <link rel="stylesheet" href="../styles/style.css">
+    <link rel="stylesheet" href="../styles/table.css">
+</head>
+<body>
+    <header>
+        <h1>OrganBank System</h1>
+        <nav>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../auth/login.html">Login</a></li>
+                <li><a href="../auth/register.html">Register</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main id="main-content">
+        <section id="public-info">
+            <h2>Available Organ Types</h2>
+            <table id="organ-types-table">
+                <thead>
+                    <tr>
+                        <th>Organ Name</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2023 Organ Bank System</p>
+    </footer>
+    <script src="../scripts/app.js"></script>
+    <script>
+        async function loadOrganTypes() {
+            try {
+                const response = await fetch(window.API_BASE_URL + 'organ-types');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+
+                const tableBody = document.querySelector('#organ-types-table tbody');
+                data.forEach(organ => {
+                    const row = tableBody.insertRow();
+                    const nameCell = row.insertCell();
+                    const descriptionCell = row.insertCell();
+                    nameCell.textContent = organ.name;
+                    descriptionCell.textContent = organ.description;
+                });
+            } catch (error) {
+                console.error('Error loading organ types:', error);
+                alert('Failed to load organ types. Please try again.');
+            }
+        }
+        loadOrganTypes();
+    </script>
+</body>
+</html>

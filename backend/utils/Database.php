@@ -1,23 +1,45 @@
 <?php
-namespace App\Utils;
 
+namespace OrganBank\Utils;
+
+use OrganBank\Config\Config;
 use PDO;
 use PDOException;
 
 class Database
 {
-    private static ?PDO $instance = null;
+    private $conn;
 
-    public static function getInstance(array $config): PDO
+    public function __construct()
     {
-        if (self::$instance === null) {
-            try {
-                self::$instance = new PDO("mysql:host={$config['host']};dbname={$config['database']}", $config['username'], $config['password']);
-                self::$instance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            } catch (PDOException $e) {
-                throw new PDOException("Database connection failed: " . $e->getMessage());
-            }
+        $this->connect();
+    }
+
+    private function connect()
+    {
+        $this->conn = null;
+        
+        $config = Config::getConfig();
+
+        if (!$config) {
+            throw new \Exception("Database configuration not found.");
         }
-        return self::$instance;
+
+        $host = $config['db']['host'];
+        $dbName = $config['db']['name'];
+        $username = $config['db']['user'];
+        $password = $config['db']['password'];
+
+        try {
+            $this->conn = new PDO("mysql:host=" . $host . ";dbname=" . $dbName, $username, $password);
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $exception) {
+            echo "Connection error: " . $exception->getMessage();
+        }
+    }
+
+    public function getConnection()
+    {
+        return $this->conn;
     }
 }

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procured Organs</title>
+    <link rel="stylesheet" href="../styles/style.css">
+    <link rel="stylesheet" href="../styles/table.css">
+</head>
+<body>
+    <header>
+        <h1>Procured Organs</h1>
+    </header>
+    <main>
+        <section id="add-organ-section">
+            <h2>Add Procured Organ</h2>
+            <form id="add-organ-form">
+                <input type="hidden" id="donation-event-id">
+                <label for="organ-type">Organ Type:</label>
+                <select id="organ-type" name="organ-type">
+                </select>
+
+                <label for="organ-external-id">Organ External ID:</label>
+                <input type="text" id="organ-external-id" name="organ-external-id">
+
+                <label for="procurement-timestamp">Procurement Timestamp:</label>
+                <input type="datetime-local" id="procurement-timestamp" name="procurement-timestamp">
+
+                <label for="preservation-timestamp">Preservation Timestamp:</label>
+                <input type="datetime-local" id="preservation-timestamp" name="preservation-timestamp">
+
+                <label for="estimated-warm-ischemia-time-minutes">Estimated Warm Ischemia Time (Minutes):</label>
+                <input type="number" id="estimated-warm-ischemia-time-minutes" name="estimated-warm-ischemia-time-minutes">
+
+                <label for="estimated-cold-ischemia-time-minutes">Estimated Cold Ischemia Time (Minutes):</label>
+                <input type="number" id="estimated-cold-ischemia-time-minutes" name="estimated-cold-ischemia-time-minutes">
+
+                <label for="expiry-timestamp">Expiry Timestamp:</label>
+                <input type="datetime-local" id="expiry-timestamp" name="expiry-timestamp">
+
+                <label for="status">Status:</label>
+                <input type="text" id="status" name="status">
+
+                <label for="description">Description:</label>
+                <input type="text" id="description" name="description">
+
+                <label for="blood-type">Blood Type:</label>
+                <input type="text" id="blood-type" name="blood-type">
+
+                <label for="clinical-notes">Clinical Notes:</label>
+                <textarea id="clinical-notes" name="clinical-notes"></textarea>
+
+                <label for="packaging-details">Packaging Details:</label>
+                <textarea id="packaging-details" name="packaging-details"></textarea>
+                <button type="submit">Add Organ</button>
+            </form>
+        </section>
+
+        <section id="organs-list-section">
+            <h2>Procured Organs List</h2>
+            <table id="organs-table">
+                <thead>
+                    <tr>
+                        <th>Organ ID</th>
+                        <th>Organ Type</th>
+                        <th>External ID</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </section>
+    </main>
+    <script type="module" src="../scripts/app.js"></script>
+    <script type="module" src="./opo.js"></script>
+</body>
+</html>

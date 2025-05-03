@@ -1,18 +1,20 @@
 <?php
 namespace App\Models;
 
+use App\Utils\Database;
+use App\Models\BaseModel;
 use PDO;
 use PDOException;
 
-class User
+class User extends BaseModel
 {
-    private PDO $db;
     private string $id;
     private string $email;
     private string $passwordHash;
     private string $firstName;
     private string $lastName;
     private ?string $phoneNumber;
+    private string $password;
     private ?string $streetAddress;
     private ?string $city;
     private ?string $stateProvince;
@@ -27,9 +29,9 @@ class User
     private ?string $lastLoginAt;
     private ?string $profilePictureUrl;
 
-    public function __construct(PDO $db)
+    public function __construct()
     {
-        $this->db = $db;
+        parent::__construct('users');
         $this->emailVerified = false;
     }
 
@@ -53,14 +55,14 @@ class User
         $this->email = $email;
     }
 
-    public function getPasswordHash(): string
+    public function getPassword(): string
     {
-        return $this->passwordHash;
+        return $this->password;
     }
 
-    public function setPasswordHash(string $passwordHash): void
+    public function setPassword(string $password): void
     {
-        $this->passwordHash = $passwordHash;
+        $this->password = $password;
     }
 
     public function getFirstName(): string
@@ -226,26 +228,22 @@ class User
     public function create(): string
     {
         try {
-            $stmt = $this->db->prepare("INSERT INTO users (id, email, password_hash, first_name, last_name, phone_number, street_address, city, state_province, country, postal_code, date_of_birth, gender, preferred_language, email_verified) VALUES (:id, :email, :password_hash, :first_name, :last_name, :phone_number, :street_address, :city, :state_province, :country, :postal_code, :date_of_birth, :gender, :preferred_language, :email_verified)");
-            $stmt->bindValue(':id', $this->id);
-            $stmt->bindValue(':email', $this->email);
-            // Hash the password before saving
-            $hashedPassword = password_hash($this->passwordHash, PASSWORD_DEFAULT);
-            $stmt->bindValue(':password_hash', $hashedPassword);
-            $stmt->bindValue(':first_name', $this->firstName);
-            $stmt->bindValue(':last_name', $this->lastName);
-            $stmt->bindValue(':phone_number', $this->phoneNumber);
+            $data = [
+                'id' => $this->id,
+                'email' => $this->email,
+                'password_hash' => $this->hashPassword($this->password),
+                'first_name' => $this->firstName,
+                'last_name' => $this->lastName,
+                'phone_number' => $this->phoneNumber,
+                'street_address' => $this->streetAddress,
+              'city' => $this->city, 
+              'state_province' => $this->stateProvince, 
+              'country' => $this->country,
+              'postal_code' => $this->postalCode,
+              'email_verified' => $this->emailVerified,
+            ];
+            $this->db->insert($this->tableName,$data);
 
-            $stmt->bindValue(':street_address', $this->streetAddress);
-            $stmt->bindValue(':city', $this->city);
-            $stmt->bindValue(':state_province', $this->stateProvince);
-            $stmt->bindValue(':country', $this->country);
-            $stmt->bindValue(':postal_code', $this->postalCode);
-            $stmt->bindValue(':date_of_birth', $this->dateOfBirth);
-            $stmt->bindValue(':gender', $this->gender);
-            $stmt->bindValue(':preferred_language', $this->preferredLanguage);
-            $stmt->bindValue(':email_verified', $this->emailVerified, PDO::PARAM_BOOL);
-            $stmt->execute();
 
             return $this->id;
         } catch (PDOException $e) {
@@ -274,8 +272,8 @@ class User
             }
 
             $params[':id'] = $this->id;
-            $sql = "UPDATE users SET " . implode(", ", $setClauses) . " WHERE id = :id";
-            $stmt = $this->db->prepare($sql);
+            $sql = "UPDATE {$this->tableName} SET " . implode(", ", $setClauses) . " WHERE id = :id";
+            $stmt = $this->db->getConnection()->prepare($sql);
             $stmt->execute($params);
 
             return true;
@@ -287,7 +285,7 @@ class User
     public function delete(): bool
     {
         try {
-            $stmt = $this->db->prepare("DELETE FROM users WHERE id = :id");
+            $stmt = $this->db->getConnection()->prepare("DELETE FROM {$this->tableName} WHERE id = :id");
             $stmt->bindValue(':id', $this->id);
             return $stmt->execute();
         } catch (PDOException $e) {
@@ -298,19 +296,19 @@ class User
     public static function getAll(PDO $db, ?string $search = null, ?array $filter = null, ?string $sort = null, ?int $page = null, ?int $per_page = 10): array
     {
         try {
-            $sql = "SELECT u.* FROM users u";
-            $sqlCount = "SELECT COUNT(*) FROM users u";
+            $sql = "SELECT u.* FROM users";
+            $sqlCount = "SELECT COUNT(*) FROM users";
 
             $whereClauses = [];
             $params = [];
 
              // Search
-             if ($search !== null) {
+            if ($search !== null) {
                 $whereClauses[] = "(u.id LIKE :search OR u.first_name LIKE :search OR u.last_name LIKE :search OR u.email LIKE :search)";
                 $params[':search'] = "%" . $search . "%";
             }
 
-            // Filter
+           // Filter
            if ($filter !== null) {
               foreach ($filter as $field => $value) {
                   if (in_array($field, ['id', 'first_name', 'last_name', 'email'])) {
@@ -355,26 +353,21 @@ class User
         }
     }
 
-    public function setPassword(string $password): void
-    {
-        $this->passwordHash = $password;
-    }
-
     // Added static method to find user by email
-    public static function getByEmail(PDO $db, string $email): ?User
+    public static function getByEmail(Database $db, string $email): ?User
     {
         try {
-            $stmt = $db->prepare("SELECT * FROM users WHERE email = :email LIMIT 1");
-            $stmt->bindValue(':email', $email);
+            $stmt = $db->getConnection()->prepare("SELECT * FROM users WHERE email = :email LIMIT 1");
+            $stmt->bindParam(':email', $email);
             $stmt->execute();
 
             $userData = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($userData) {
                 // Create a new User instance and populate it
-                $user = new self($db); // Use self($db) to call constructor
+                $user = new self(); // Use self($db) to call constructor
                 $user->id = $userData['id'];
-                $user->email = $userData['email'];
+                 $user->email = $userData['email'];
                 $user->passwordHash = $userData['password_hash'];
                 $user->firstName = $userData['first_name'];
                 $user->lastName = $userData['last_name'];
@@ -391,11 +384,6 @@ class User
                 $user->createdAt = $userData['created_at'];
                 $user->updatedAt = $userData['updated_at'];
                 $user->lastLoginAt = $userData['last_login_at'];
-                $user->profilePictureUrl = $userData['profile_picture_url'];
-                // Add is_admin if it exists in your table
-                // if (isset($userData['is_admin'])) {
-                //     $user->isAdmin = (bool)$userData['is_admin'];
-                // }
 
                 return $user;
             }
@@ -409,7 +397,33 @@ class User
         }
     }
 
-    public function getPassword(): string // Renamed from getPasswordHash for consistency with AuthController
+    // Added static method to find user by ID
+    public static function getById(Database $db, string $id): ?User
+    {
+        try {
+            $stmt = $db->getConnection()->prepare("SELECT * FROM users WHERE id = :id LIMIT 1");
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+
+            $userData = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+            if ($userData) {
+                return self::createUserFromData($userData);
+            }
+    
+            return null; 
+    
+        } catch (PDOException $e) {
+            return null; 
+        }
+    }
+
+    public function hashPassword(string $password): string
+    {
+        return password_hash($password, PASSWORD_DEFAULT);
+    }
+
+    public function getPasswordHash(): string // Renamed from getPasswordHash for consistency with AuthController
     {
         return $this->passwordHash;
     }

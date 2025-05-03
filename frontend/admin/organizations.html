@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizations</title>
+    <link rel="stylesheet" href="../styles/style.css">
+    <link rel="stylesheet" href="../styles/table.css">
+    <link rel="stylesheet" href="../styles/modal.css">
+</head>
+<body>
+    <main>
+        <section id="organizations-content">
+            <h2>Organizations</h2>
+            <button id="create-organization-button">Create New Organization</button>
+
+            <div id="create-organization-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close-button">&times;</span>
+                    <h3>Create Organization</h3>
+                    <form id="create-organization-form">
+                        <label for="org-name">Name:</label>
+                        <input type="text" id="org-name" name="org-name" required><br><br>
+
+                        <label for="org-type">Type:</label>
+                        <select id="org-type" name="org-type" required>
+                            <option value="Hospital">Hospital</option>
+                            <option value="OPO">OPO</option>
+                            <option value="Transplant Center">Transplant Center</option>
+                        </select><br><br>
+
+                        <label for="org-street-address">Street Address:</label>
+                        <input type="text" id="org-street-address" name="org-street-address" required><br><br>
+
+                        <label for="org-city">City:</label>
+                        <input type="text" id="org-city" name="org-city" required><br><br>
+
+                        <label for="org-state-province">State/Province:</label>
+                        <input type="text" id="org-state-province" name="org-state-province" required><br><br>
+
+                        <label for="org-country">Country:</label>
+                        <input type="text" id="org-country" name="org-country" required><br><br>
+
+                        <label for="org-postal-code">Postal Code:</label>
+                        <input type="text" id="org-postal-code" name="org-postal-code" required><br><br>
+
+                        <label for="org-phone-number">Phone Number:</label>
+                        <input type="text" id="org-phone-number" name="org-phone-number"><br><br>
+
+                        <label for="org-email">Email:</label>
+                        <input type="email" id="org-email" name="org-email"><br><br>
+
+                        <label for="org-website-url">Website URL:</label>
+                        <input type="url" id="org-website-url" name="org-website-url"><br><br>
+
+                        <button type="submit">Create Organization</button>
+                    </form>
+                </div>
+            </div>
+
+            <table id="organizations-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Organizations will be listed here -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+    <script type="module" src="../scripts/app.js"></script>
+    <script type="module" src="../admin/admin.js"></script>
+</body>
+</html>
