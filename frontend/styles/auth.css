@@ -1,0 +1,28 @@
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border: 1px solid black;
+    z-index: 1000;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.modal input {
+    display: block;
+    margin: 10px 0;
+    padding: 5px;
+    width: 200px;
+}
+
+.modal button {
+    display: inline-block;
+    margin: 10px 5px 0 0;
+}
+
+.modal label {
+    display: block;
+    margin: 10px 0 0 0;
+}
