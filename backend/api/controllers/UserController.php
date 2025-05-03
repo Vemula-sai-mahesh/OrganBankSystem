@@ -1,6 +1,4 @@
-php
 <?php
-
 namespace App\Controllers;
 
 use App\Models\User;
@@ -76,16 +74,33 @@ class UserController
         $user = new User($this->db);
         $user->setId(uniqid());
         $user->setEmail($data['email']);
-        $user->setPasswordHash(password_hash($data['password'], PASSWORD_DEFAULT));
+        $user->setPassword($data['password']);
         $user->setFirstName($data['first_name']);
         $user->setLastName($data['last_name']);
 
+        // Initialize optional fields to null
+        $user->setPhoneNumber($data['phone_number'] ?? null);
+        $user->setStreetAddress($data['street_address'] ?? null);
+        $user->setCity($data['city'] ?? null);
+        $user->setStateProvince($data['state_province'] ?? null);
+        $user->setCountry($data['country'] ?? null);
+        $user->setPostalCode($data['postal_code'] ?? null);
+        $user->setDateOfBirth($data['date_of_birth'] ?? null);
+        $user->setGender($data['gender'] ?? null);
+        $user->setPreferredLanguage($data['preferred_language'] ?? null);
+        $user->setProfilePictureUrl($data['profile_picture_url'] ?? null);
+        // emailVerified defaults to false in constructor
+
         try {
             $userId = $user->create();
+            ob_end_clean(); // Clear buffer before final output
             echo json_encode(['message' => 'User created', 'id' => $userId]);
             http_response_code(201);
         } catch (PDOException $e) {
-            echo json_encode(['error' => $e->getMessage()]);
+            // Let index.php handle logging/generic response
+            // If we get here, clear buffer and send specific error
+            ob_end_clean(); 
+            echo json_encode(['error' => 'Database error during user creation.']); 
             http_response_code(500);
         }
     }
@@ -96,6 +111,7 @@ class UserController
 
         // Validate email format if provided
         if (isset($data['email']) && !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+            ob_end_clean();
             echo json_encode(['error' => 'Invalid email format']);
             http_response_code(400);
             return;
@@ -103,6 +119,7 @@ class UserController
 
         // Validate password length if provided
         if (isset($data['password']) && strlen($data['password']) < 8) {
+            ob_end_clean();
             echo json_encode(['error' => 'Password must be at least 8 characters long']);
             http_response_code(400);
             return;
@@ -113,14 +130,17 @@ class UserController
 
         try {
             if (!$user->update($data)) {
-                echo json_encode(['error' => 'User not found']);
-                http_response_code(404);
+                ob_end_clean();
+                echo json_encode(['error' => 'User not found or no changes made']);
+                http_response_code(404); // Or 200 if no changes is ok
                 return;
             }
+            ob_end_clean();
             echo json_encode(['message' => 'User updated']);
             http_response_code(200);
         } catch (PDOException $e) {
-            echo json_encode(['error' => $e->getMessage()]);
+            ob_end_clean();
+            echo json_encode(['error' => 'Database error during user update.']);
             http_response_code(500);
         }
     }
@@ -131,14 +151,17 @@ class UserController
         $user->setId($id);
         try {
             if (!$user->delete()) {
+                ob_end_clean();
                 echo json_encode(['error' => 'User not found']);
                 http_response_code(404);
                 return;
             }
+            ob_end_clean();
             echo json_encode(['message' => 'User deleted']);
             http_response_code(200);
         } catch (PDOException $e) {
-            echo json_encode(['error' => $e->getMessage()]);
+            ob_end_clean();
+            echo json_encode(['error' => 'Database error during user deletion.']);
             http_response_code(500);
         }
     }
@@ -148,15 +171,19 @@ class UserController
         $user = new User($this->db);
         $user->setId($id);
         try {
-            if (!$user->update(['is_admin' => 1])) {
-                echo json_encode(['error' => 'User not found']);
-                http_response_code(404);
+            // Assuming update method handles 'is_admin' flag
+            if (!$user->update(['is_admin' => 1])) { 
+                ob_end_clean();
+                echo json_encode(['error' => 'User not found or could not be updated']);
+                http_response_code(404); // Or 500
                 return;
             }
+            ob_end_clean();
             echo json_encode(['message' => 'User updated as admin']);
             http_response_code(200);
         } catch (PDOException $e) {
-            echo json_encode(['error' => $e->getMessage()]);
+            ob_end_clean();
+            echo json_encode(['error' => 'Database error setting user as admin.']);
             http_response_code(500);
         }
     }

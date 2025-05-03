@@ -1,6 +1,4 @@
-php
 <?php
-
 namespace App\Models;
 
 use PDO;
@@ -215,16 +213,6 @@ class DonationEvent
         } catch (PDOException $e) {
             return false;
         }
-    }
-
-    public function setId(string $id): void
-    {
-        $this->id = $id;
-    }
-
-    public function setUpdatedAt(?string $updatedAt): void
-    {
-        $this->updatedAt = $updatedAt;
     }
 
     public static function getAll(PDO $db, ?string $search = null, ?array $filter = null, ?string $sort = null, ?int $page = null, ?int $per_page = 10): array

@@ -1,6 +1,4 @@
-php
 <?php
-
 namespace App\Models;
 
 use PDO;
@@ -360,5 +358,59 @@ class User
     public function setPassword(string $password): void
     {
         $this->passwordHash = $password;
+    }
+
+    // Added static method to find user by email
+    public static function getByEmail(PDO $db, string $email): ?User
+    {
+        try {
+            $stmt = $db->prepare("SELECT * FROM users WHERE email = :email LIMIT 1");
+            $stmt->bindValue(':email', $email);
+            $stmt->execute();
+
+            $userData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($userData) {
+                // Create a new User instance and populate it
+                $user = new self($db); // Use self($db) to call constructor
+                $user->id = $userData['id'];
+                $user->email = $userData['email'];
+                $user->passwordHash = $userData['password_hash'];
+                $user->firstName = $userData['first_name'];
+                $user->lastName = $userData['last_name'];
+                $user->phoneNumber = $userData['phone_number'];
+                $user->streetAddress = $userData['street_address'];
+                $user->city = $userData['city'];
+                $user->stateProvince = $userData['state_province'];
+                $user->country = $userData['country'];
+                $user->postalCode = $userData['postal_code'];
+                $user->dateOfBirth = $userData['date_of_birth'];
+                $user->gender = $userData['gender'];
+                $user->preferredLanguage = $userData['preferred_language'];
+                $user->emailVerified = (bool)$userData['email_verified'];
+                $user->createdAt = $userData['created_at'];
+                $user->updatedAt = $userData['updated_at'];
+                $user->lastLoginAt = $userData['last_login_at'];
+                $user->profilePictureUrl = $userData['profile_picture_url'];
+                // Add is_admin if it exists in your table
+                // if (isset($userData['is_admin'])) {
+                //     $user->isAdmin = (bool)$userData['is_admin'];
+                // }
+
+                return $user;
+            }
+
+            return null; // Return null if user not found
+
+        } catch (PDOException $e) {
+            // Optionally log the error here before re-throwing or returning null
+            // error_log("Error in getByEmail: " . $e->getMessage());
+            return null; // Or rethrow: throw new PDOException("Error fetching user by email: " . $e->getMessage());
+        }
+    }
+
+    public function getPassword(): string // Renamed from getPasswordHash for consistency with AuthController
+    {
+        return $this->passwordHash;
     }
 }

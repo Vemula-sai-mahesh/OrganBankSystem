@@ -1,5 +1,5 @@
 // Import all the js files
-import { login, logout, showLoginModal } from './auth.js';
+import { login, logout, showLoginModal, showRegisterModal } from './auth.js';
 import { loadSection, showDetails } from './data.js';
 import { createFilterSection, getFiltersFromSection } from './filters.js';
 import { createSortSection } from './sorting.js';
@@ -13,7 +13,9 @@ window.API_BASE_URL = API_BASE_URL;
 window.loadSection = loadSection;
 
 const loginButton = document.getElementById('loginButton');
+const registerButton = document.getElementById('registerButton');
 const logoutButton = document.getElementById('logoutButton');
 
 loginButton.addEventListener('click', showLoginModal);
+registerButton.addEventListener('click', showRegisterModal);
 logoutButton.addEventListener('click', logout);

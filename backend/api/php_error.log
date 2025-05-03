@@ -1,0 +1,39 @@
+[03-May-2025 13:36:06 UTC] PHP Fatal error:  Namespace declaration statement has to be the very first statement or after any declare call in the script in C:\wamp64\www\OrganBankSystem\backend\api\controllers\AuthController.php on line 4
+[03-May-2025 13:36:06 UTC] PHP Stack trace:
+[03-May-2025 13:36:06 UTC] PHP   1. {main}() C:\wamp64\www\OrganBankSystem\backend\api\index.php:0
+[03-May-2025 13:36:06 UTC] PHP   2. class_exists($class = 'App\\Controllers\\\\App\\Controllers\\AuthController') C:\wamp64\www\OrganBankSystem\backend\api\index.php:201
+[03-May-2025 13:36:06 UTC] PHP   3. {closure:C:\wamp64\www\OrganBankSystem\backend\api\index.php:76-96}($class = 'App\\Controllers\\\\App\\Controllers\\AuthController') C:\wamp64\www\OrganBankSystem\backend\api\index.php:201
+[03-May-2025 13:36:34 UTC] PHP Fatal error:  Namespace declaration statement has to be the very first statement or after any declare call in the script in C:\wamp64\www\OrganBankSystem\backend\api\controllers\AuthController.php on line 4
+[03-May-2025 13:36:34 UTC] PHP Stack trace:
+[03-May-2025 13:36:34 UTC] PHP   1. {main}() C:\wamp64\www\OrganBankSystem\backend\api\index.php:0
+[03-May-2025 13:36:34 UTC] PHP   2. class_exists($class = 'App\\Controllers\\\\App\\Controllers\\AuthController') C:\wamp64\www\OrganBankSystem\backend\api\index.php:201
+[03-May-2025 13:36:34 UTC] PHP   3. {closure:C:\wamp64\www\OrganBankSystem\backend\api\index.php:76-96}($class = 'App\\Controllers\\\\App\\Controllers\\AuthController') C:\wamp64\www\OrganBankSystem\backend\api\index.php:201
+[03-May-2025 13:36:39 UTC] PHP Fatal error:  Namespace declaration statement has to be the very first statement or after any declare call in the script in C:\wamp64\www\OrganBankSystem\backend\api\controllers\AuthController.php on line 4
+[03-May-2025 13:36:39 UTC] PHP Stack trace:
+[03-May-2025 13:36:39 UTC] PHP   1. {main}() C:\wamp64\www\OrganBankSystem\backend\api\index.php:0
+[03-May-2025 13:36:39 UTC] PHP   2. class_exists($class = 'App\\Controllers\\\\App\\Controllers\\AuthController') C:\wamp64\www\OrganBankSystem\backend\api\index.php:201
+[03-May-2025 13:36:39 UTC] PHP   3. {closure:C:\wamp64\www\OrganBankSystem\backend\api\index.php:76-96}($class = 'App\\Controllers\\\\App\\Controllers\\AuthController') C:\wamp64\www\OrganBankSystem\backend\api\index.php:201
+[2025-05-03 13:40:12] Uncaught Error: Error - Call to undefined method App\Models\User::getByEmail() in C:\wamp64\www\OrganBankSystem\backend\api\controllers\AuthController.php:29
+Stack trace:
+#0 C:\wamp64\www\OrganBankSystem\backend\api\index.php(205): App\Controllers\AuthController->login()
+#1 {main}
+[2025-05-03 13:43:30] Uncaught Error: PDOException - Error checking if email exists: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'organbank.users' doesn't exist in C:\wamp64\www\OrganBankSystem\backend\api\controllers\UserController.php:170
+Stack trace:
+#0 C:\wamp64\www\OrganBankSystem\backend\api\controllers\UserController.php(68): App\Controllers\UserController->emailExists('saimahesh2382@g...')
+#1 C:\wamp64\www\OrganBankSystem\backend\api\index.php(205): App\Controllers\UserController->store()
+#2 {main}
+[2025-05-03 13:43:48] Uncaught Error: PDOException - Error checking if email exists: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'organbank.users' doesn't exist in C:\wamp64\www\OrganBankSystem\backend\api\controllers\UserController.php:170
+Stack trace:
+#0 C:\wamp64\www\OrganBankSystem\backend\api\controllers\UserController.php(68): App\Controllers\UserController->emailExists('saimahesh2382@g...')
+#1 C:\wamp64\www\OrganBankSystem\backend\api\index.php(205): App\Controllers\UserController->store()
+#2 {main}
+[2025-05-03 13:48:15] Uncaught Error: Error - Typed property App\Models\User::$phoneNumber must not be accessed before initialization in C:\wamp64\www\OrganBankSystem\backend\models\User.php:237
+Stack trace:
+#0 C:\wamp64\www\OrganBankSystem\backend\api\controllers\UserController.php(82): App\Models\User->create()
+#1 C:\wamp64\www\OrganBankSystem\backend\api\index.php(205): App\Controllers\UserController->store()
+#2 {main}
+[2025-05-03 13:51:15] Uncaught Error: Error - Typed property App\Models\User::$phoneNumber must not be accessed before initialization in C:\wamp64\www\OrganBankSystem\backend\models\User.php:237
+Stack trace:
+#0 C:\wamp64\www\OrganBankSystem\backend\api\controllers\UserController.php(82): App\Models\User->create()
+#1 C:\wamp64\www\OrganBankSystem\backend\api\index.php(205): App\Controllers\UserController->store()
+#2 {main}

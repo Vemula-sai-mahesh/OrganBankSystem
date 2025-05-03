@@ -2,7 +2,7 @@
 
 return [
     'host' => 'localhost',
-    'database' => 'OrganBank',
+    'database' => 'organ_bank_system',
     'username' => 'root',
     'password' => '',
 ];

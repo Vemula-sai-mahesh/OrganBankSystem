@@ -1,6 +1,4 @@
-php
 <?php
-
 namespace App\Controllers;
 
 use PDO;
@@ -33,17 +31,21 @@ class AuthController
             if ($user && password_verify($data['password'], $user->getPassword())) {
                 session_start();
                 $_SESSION['user_id'] = $user->getId();
+                ob_end_clean();
                 echo json_encode(['message' => 'Logged in successfully', 'user_id' => $user->getId()]);
                 http_response_code(200);
             } else {
+                ob_end_clean();
                 echo json_encode(['error' => 'Invalid credentials']);
                 http_response_code(401);
             }
         } catch (PDOException $e) {
-            echo json_encode(['error' => $e->getMessage()]);
+            ob_end_clean();
+            echo json_encode(['error' => 'Database error during login.']);
             http_response_code(500);
         } catch (\Exception $e) {
-            echo json_encode(['error' => $e->getMessage()]);
+            ob_end_clean();
+            echo json_encode(['error' => 'General error during login.']);
             http_response_code(500);
         }
     }
@@ -53,10 +55,12 @@ class AuthController
         try {
             session_start();
             session_destroy();
+            ob_end_clean();
             echo json_encode(['message' => 'Logged out successfully']);
             http_response_code(200);
         } catch (\Exception $e) {
-            echo json_encode(['error' => $e->getMessage()]);
+            ob_end_clean();
+            echo json_encode(['error' => 'Error during logout.']);
             http_response_code(500);
         }
     }
