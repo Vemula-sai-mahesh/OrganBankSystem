@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organ Bank System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header>
+        <h1>Organ Bank System</h1>
+        <nav>
+            <ul>
+                <li><a href="#" onclick="loadSection('users')">Users</a></li>
+                <li><a href="#" onclick="loadSection('organizations')">Organizations</a></li>
+                <li><a href="#" onclick="loadSection('donation-events')">Donation Events</a></li>
+                <li><a href="#" onclick="loadSection('procured-organs')">Procured Organs</a></li>
+                <li><a href="#" onclick="loadSection('medical-markers')">Medical Markers</a></li>
+                <li><a href="#" onclick="loadSection('organ-transplants')">Organ Transplants</a></li>
+            </ul>
+        </nav>
+        <div id="auth">
+            <button id="loginButton">Login</button>
+            <button id="logoutButton" style="display: none;">Logout</button>
+        </div>
+    </header>
+
+    <main>
+        <section id="content">
+            <h2>Welcome to the Organ Bank System</h2>
+            <p>Please select an option from the navigation menu.</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Organ Bank System</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+
+</html>
