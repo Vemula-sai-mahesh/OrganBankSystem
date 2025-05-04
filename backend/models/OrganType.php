@@ -1,4 +1,3 @@
-php
 <?php
 
 require_once 'BaseModel.php'; // Make sure this path is correct

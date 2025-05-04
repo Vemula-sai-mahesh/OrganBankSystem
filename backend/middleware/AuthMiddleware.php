@@ -1,6 +1,4 @@
-php
 <?php
-
 namespace OrganBankSystem\Backend\Middleware;
 
 use Firebase\JWT\JWT;

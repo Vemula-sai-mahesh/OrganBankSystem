@@ -1,6 +1,4 @@
-php
 <?php
-
 namespace OrganBankSystem\Backend\Api\Middleware;
 
 use OrganBankSystem\Backend\Models\UserRole;

@@ -1,4 +1,3 @@
-php
 <?php
 require_once __DIR__ . '/../models/Transplant.php';
 require_once __DIR__ . '/BaseController.php';
@@ -95,19 +94,22 @@ class TransplantController extends BaseController
 
     public function delete($id)
     {
-        $transplant = Transplant::find($id);
-        if (!$transplant) {
-            return $this->respondWithError("Transplant not found", 404);
-        }
-
-        if ($transplant->delete()) {
-            return $this->respondWithSuccess(null, 204);
-        }
-        else {
+        try {
+            $transplant = Transplant::find($id);
+    
+            if (!$transplant) {
+                return $this->respondWithError("Transplant not found", 404);
+            }
+    
+            if ($transplant->delete()) {
+                return $this->respondWithSuccess(null, 204);
+            } else {
+                return $this->respondWithError("Failed to delete transplant", 500);
+            }
+        } catch (Exception $e) {
+            error_log("Transplant delete error: " . $e->getMessage());
             return $this->respondWithError("Failed to delete transplant", 500);
         }
-    } catch (Exception $e) {
-        error_log("Transplant delete error: " . $e->getMessage());
-        return $this->respondWithError("Failed to delete transplant", 500);
     }
+    
 }

@@ -1,6 +1,4 @@
-php
 <?php
-
 require_once __DIR__ . '/../../models/MedicalMarkerType.php';
 require_once __DIR__ . '/BaseController.php';
 

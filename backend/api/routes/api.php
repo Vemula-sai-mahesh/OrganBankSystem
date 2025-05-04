@@ -1,5 +1,4 @@
 <?php
-
 use OrganBank\Controllers\AuthController;
 use OrganBank\Controllers\UserController;
 use OrganBank\Controllers\OrganizationController;
