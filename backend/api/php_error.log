@@ -1,0 +1,10 @@
+[2025-05-04 05:55:52] Handler Error (register [POST]): Error - Call to undefined method App\Controllers\AuthController::respondWithError() in C:\wamp64\www\OrganBankSystem\backend\api\controllers\AuthController.php:62
+Stack trace:
+#0 C:\wamp64\www\OrganBankSystem\backend\api\index.php(243): App\Controllers\AuthController->register()
+#1 {main}
+[2025-05-04 06:23:31] Handler Error (users [POST]): Error - Class "App\Models\BaseModel" not found in C:\wamp64\www\OrganBankSystem\backend\models\User.php:9
+Stack trace:
+#0 C:\wamp64\www\OrganBankSystem\backend\api\index.php(79): require_once()
+#1 C:\wamp64\www\OrganBankSystem\backend\api\controllers\UserController.php(85): {closure}('App\\Models\\User')
+#2 C:\wamp64\www\OrganBankSystem\backend\api\index.php(244): App\Controllers\UserController->store()
+#3 {main}

@@ -5,26 +5,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Organ Bank System</title>
-    <link rel="stylesheet" href="styles/style.css">
-    <link rel="stylesheet" href="styles/auth.css">
-    <link rel="stylesheet" href="styles/table.css">
-    <link rel="stylesheet" href="styles/modal.css">
-    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="./styles/style.css">
+    <link rel="stylesheet" href="./styles/auth.css">
+    <link rel="stylesheet" href="./styles/table.css">
+    <link rel="stylesheet" href="./styles/modal.css">
 </head>
 
 <body>
     <header>
         <h1>Organ Bank System</h1>
-        <nav id="main-nav"></nav>
+        <nav>
+            <ul>
+                <li><a href="#" onclick="loadSection('users')">Users</a></li>
+                <li><a href="profile.html">Profile</a></li>
+                <li><a href="login.html">Login</a></li>
+                <li><a href="register.html">Register</a></li>
+                
+            </ul>
+        </nav>
+        <div id="auth">
+            <div id="logout-container"></div>
+        </div>
     </header>
 
     <main>
         <section id="main-content">
-           <div id="auth">
-                <div id="logout-container">
-                    <button id="logoutButton">Logout</button>
-                </div>
-            </div>
+           
         </section>
     </main>
 
