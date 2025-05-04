@@ -9,7 +9,6 @@ use OrganBankSystem\Backend\Models\User;
 use OrganBankSystem\Backend\Models\OrganType;
 use setasign\Fpdi\Fpdi;
 
-require_once __DIR__ . '/../../../vendor/autoload.php';
 
 
 class BaseController {
