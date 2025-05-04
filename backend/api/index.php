@@ -102,7 +102,7 @@ try {
     // Remove the base path if present
     $basePath = '/OrganBankSystem/backend/api/';
     if (strpos($requestUri, $basePath) === 0) {
-        $requestUri = ltrim(substr($requestUri, strlen($basePath)), '/'); // Trim leading slash too
+        $requestUri = substr($requestUri, strlen($basePath));
     }
 
     // Middleware function needs access to log path potentially
@@ -139,6 +139,7 @@ try {
         }], // Changed '/' to '' to match trimmed requestUri
         'login' => ['POST' => 'App\Controllers\AuthController@login'],
         'logout' => ['POST' => 'App\Controllers\AuthController@logout'],
+        'register' => ['POST' => 'App\Controllers\AuthController@register'],
         'organizations' => ['GET' => 'App\Controllers\OrganizationController@index', 'POST' => 'App\Controllers\OrganizationController@store'],
         'users/{id}/admin' => [
                 'PUT' => function ($db, $id) use ($logFilePath) { // Pass logFilePath
