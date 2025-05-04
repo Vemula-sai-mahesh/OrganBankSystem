@@ -1,4 +1,3 @@
-php
 <?php
 
 class Transplant extends BaseModel {

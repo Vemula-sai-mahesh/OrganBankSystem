@@ -1,15 +1,12 @@
 <?php
-
 namespace App\Controllers;
 
 use App\Models\User;
-use PDOException;
 use App\Models\UserRole;
+use PDOException;
 
 class UserController extends BaseController
 {
-    
-
     public function __construct()
     {
     }
@@ -35,6 +32,7 @@ class UserController extends BaseController
                 }
                 $sort .= "&" . $direction;
             }
+
             $users = User::getAll($search, $filter, $sort, $page, $per_page);
             echo json_encode($users);
         } catch (\Exception $e) {
@@ -66,14 +64,13 @@ class UserController extends BaseController
             return;
         }
 
-        }
-
         // Validate password length
         if (strlen($data['password']) < 8) {
             echo json_encode(['error' => 'Password must be at least 8 characters long']);
             http_response_code(400);
             return;
         }
+
         if (User::emailExists($data['email'])) {
             $this->sendErrorResponse('User with this email already exists', 409);
             return;
@@ -112,8 +109,10 @@ class UserController extends BaseController
     {
         $data = json_decode(file_get_contents('php://input'), true);
         $user = User::getById($id);
+
         if (!$user) {
             $this->sendErrorResponse('User not found', 404);
+            return;
         }
 
         if (isset($data['email']) && !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
@@ -125,6 +124,7 @@ class UserController extends BaseController
             $this->sendErrorResponse('Password must be at least 8 characters long', 400);
             return;
         }
+
         try {
             $user->update($id, $data);
             $this->sendJsonResponse(['message' => 'User updated']);
@@ -133,23 +133,21 @@ class UserController extends BaseController
         }
     }
 
-       public function delete(string $id)
-    {   
-
+    public function delete(string $id)
+    {
         $user = User::getById($id);
 
         if (!$user) {
             $this->sendErrorResponse('User not found', 404);
             return;
         }
-        if (!$user->delete($id)) {
-            return;
-        }
+
         try {
-            if (!$user->delete()) {
+            if (!$user->delete($id)) {
                 $this->sendErrorResponse('User not found', 404);
                 return;
             }
+
             $this->sendJsonResponse(['message' => 'User deleted']);
         } catch (PDOException $e) {
             $this->sendErrorResponse('Database error during user deletion.');

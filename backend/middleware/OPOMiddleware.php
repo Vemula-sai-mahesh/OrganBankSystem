@@ -1,35 +1,32 @@
-php
 <?php
+namespace OrganBankSystem\Backend\Api\Middleware;
 
-namespace OrganBankSystem\Backend\Middleware;
-
-use OrganBankSystem\Backend\Models\User;
 use OrganBankSystem\Backend\Models\UserRole;
-
-use OrganBankSystem\Backend\Utils\Database;
-use PDO;
 
 class OPOMiddleware
 {
-    public static function handle()
+    public function __construct()
     {
-        // Check if the user is logged in and has the OPO Coordinator role
-        $token = self::extractTokenFromHeader();
+    }
 
-        if (!$token) {
+    public function isOPOCoordinator($headers)
+    {
+        $authMiddleware = new AuthMiddleware();
+        $decoded = $authMiddleware->authenticate($headers);
+
+        if (!$decoded || !isset($decoded->user_id)) {
             http_response_code(401); // Unauthorized
-            echo json_encode(['message' => 'Unauthorized: No token provided']);
-            exit;
+            echo json_encode(["message" => "Unauthorized: Invalid or missing token"]);
+            return false;
         }
 
-        $payload = self::validateToken($token);
-
-        if (!$payload) {
-            http_response_code(401); // Unauthorized
-            echo json_encode(['message' => 'Unauthorized: Invalid token']);
-            exit;
-        }
-
-        if (!self::isOPO($payload['user_id'])) {
+        $userRole = new UserRole();
+        if (!$userRole->hasRole($decoded->user_id, 'opo_coordinator')) {
             http_response_code(403); // Forbidden
-            echo json_encode(['message' => 'Forbidden: User
+            echo json_encode(["message" => "Forbidden: OPO Coordinator role required"]);
+            return false;
+        }
+
+        return true;
+    }
+}

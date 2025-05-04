@@ -1,6 +1,4 @@
-php
-<?php
-
+<?php 
 require_once __DIR__ . '/../../models/ApiKey.php';
 require_once __DIR__ . '/BaseController.php';
 

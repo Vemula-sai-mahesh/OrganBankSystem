@@ -1,6 +1,4 @@
-php
 <?php
-
 namespace OrganBankSystem\backend\middleware;
 
 use OrganBankSystem\backend\utils\Database;

@@ -1,6 +1,4 @@
-php
 <?php
-
 namespace OrganBankSystem\Backend\API\Controllers;
 
 use OrganBankSystem\Backend\Models\UserPlatformIntent;

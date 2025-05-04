@@ -1,5 +1,4 @@
 <?php
-
 namespace OrganBankSystem\backend\api\Controllers;
 
 use OrganBankSystem\backend\Models\Organization;
