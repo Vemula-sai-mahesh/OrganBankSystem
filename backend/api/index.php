@@ -121,14 +121,14 @@ try {
 
 
     // Remove the base path if present and handle query strings
-    $basePath = '/OrganBankSystem/backend/api/'; 
+    $basePath = '/OrganBankSystem/backend/api/';
     $requestPath = parse_url($requestUri, PHP_URL_PATH); // Get only the path part
 
     if (strpos($requestPath, $basePath) === 0) {
-        $requestPath = ltrim(substr($requestPath, strlen($basePath)), '/'); // Trim leading slash too
+        $requestPath = substr($requestPath, strlen($basePath)); 
     } else {
-         $requestPath = ltrim($requestPath, '/'); // Trim leading slash if base path isn't present
->>>>>>> 2637b9796d58461b7e1c90de909a0ab50fab4e5f
+        $requestPath = ltrim($requestPath, '/'); // Trim leading slash if base path isn't present
+    }
     
 
     // Middleware function (ensure session is started appropriately if needed)
@@ -170,11 +170,10 @@ try {
         'login' => ['POST' => 'App\Controllers\AuthController@login'],
         'logout' => ['POST' => 'App\Controllers\AuthController@logout'],
         // Auth
-        'register' => ['POST' => 'App\Controllers\AuthController@register'],
-
-
-        'organizations' => ['GET' => 'App\Controllers\OrganizationController@index', 'POST' => 'App\Controllers\OrganizationController@store'],
-       'organizations/{id}' => ['PUT' => 'App\Controllers\OrganizationController@update', 'DELETE' => 'App\Controllers\OrganizationController@delete'],
+        'register' => ['POST' => 'App\Controllers\AuthController@register'],   
+        // Organizations
+        'organizations' => ['GET' => 'App\Controllers\OrganizationController@index','POST' => 'App\Controllers\OrganizationController@store'],
+        'organizations/{id}' => ['PUT' => 'App\Controllers\OrganizationController@update','DELETE' => 'App\Controllers\OrganizationController@delete'],
         // Users
         'users' => ['GET' => 'App\Controllers\UserController@index', 'POST' => 'App\Controllers\UserController@store'], // User registration/creation
         'users/{id}' => [
