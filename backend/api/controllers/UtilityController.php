@@ -1,5 +1,5 @@
 <?php
-namespace OrganBankSystem\Backend\API\Controllers;
+namespace App\Controllers;
 
 use OrganBankSystem\Backend\Models\UserPlatformIntent;
 use OrganBankSystem\Backend\Models\ProcuredOrgan;
