@@ -4,19 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
-    <link rel="stylesheet" href="./styles/auth.css">
+    <link rel="stylesheet" href="styles/auth.css">
 </head>
 <body>
     <div class="container">
         <h2>Register</h2>
-        <form method="post" action="/OrganBankSystem/backend/api/register">
+        <form method="post" action="/OrganBankSystem/backend/api/users" id="registerForm">
+            <section id="basicInfo">
+                <h3>Basic Account Information</h3>
             <div class="form-group">
                 <label for="firstName">First Name:</label>
-                <input type="text" id="firstName" name="firstName" required>
+                <input type="text" id="firstName" name="first_name" required>
             </div>
             <div class="form-group">
                 <label for="lastName">Last Name:</label>
-                <input type="text" id="lastName" name="lastName" required>
+                <input type="text" id="lastName" name="last_name" required>
             </div>
             <div class="form-group">
                 <label for="email">Email:</label>
@@ -24,11 +26,90 @@
             </div>
             <div class="form-group">
                 <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" id="password" name="password" required minlength="8">
+            </div>
+            </section>
+             <section id="personalInfo">
+                <h3>Personal Information</h3>
+            <div class="form-group">
+                <label for="phone_number">Phone Number:</label>
+                <input type="text" id="phone_number" name="phone_number">
+            </div>
+              </section>
+            <section id="locationInfo">
+                 <h3>Location Information</h3>
+            <div class="form-group">
+                <label for="street_address">Street Address:</label>
+                <input type="text" id="street_address" name="street_address">
+            </div>
+            <div class="form-group">
+                <label for="city">City:</label>
+                <input type="text" id="city" name="city">
+            </div>
+            <div class="form-group">
+                <label for="state_province">State/Province:</label>
+                <input type="text" id="state_province" name="state_province">
+            </div>
+            <div class="form-group">
+                <label for="postal_code">Postal Code:</label>
+                <input type="text" id="postal_code" name="postal_code">
+            </div>
+            <div class="form-group">
+                <label for="country">Country:</label>
+                <input type="text" id="country" name="country">
+            </div>
+            </section>
+            <section id="donorSpecific">
+            <h3>Donor Specific</h3>
+            <div class="form-group">
+               <input type="checkbox" id="isDonor" name="isDonor" checked>
+               <label for="isDonor">I want to declare my intent to donate organs</label>
+            </div>
+            </section>
+            <section id="orgRoleSelection" style="display: none;">
+                <h3>Organization and Role Selection</h3>
+                <div class="form-group">
+                <label for="organization_id">Organization:</label>
+                <select id="organization_id" name="organization_id">
+                    </select>
+            </div>
+               <div class="form-group">
+                <label for="role_name">Role:</label>
+                <select id="role_name" name="role_name">
+                    </select>
+            </div>
+            </section>
+             <section id="termsAndConditions">
+             <h3>Terms and Conditions</h3>
             </div>
             <button type="submit">Register</button>
         </form>
         <p>Already have an account? <a href="login.html">Login</a></p>
     </div>
 </body>
+<script>
+    const isDonorCheckbox = document.getElementById('isDonor');
+    const orgRoleSelection = document.getElementById('orgRoleSelection');
+    const registerForm = document.getElementById('registerForm');
+
+    isDonorCheckbox.addEventListener('change', () => {
+        orgRoleSelection.style.display = isDonorCheckbox.checked ? 'none' : 'block';
+    });
+
+    registerForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const formData = new FormData(registerForm);
+    const data = Object.fromEntries(formData.entries());
+    
+    try {
+        const response = await fetch(registerForm.action, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+    } catch (error) {
+        console.error('Error:', error);
+    }
+});
+</script>
 </html>

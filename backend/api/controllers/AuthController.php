@@ -48,54 +48,6 @@ class AuthController extends BaseController
         }
     }
 
-    public function register(): void
-    {
-        $data = json_decode(file_get_contents('php://input'), true);
-
-        if (
-            !isset($data['first_name']) ||
-            !isset($data['last_name']) ||
-            !isset($data['email']) ||
-             !isset($data['organization_id']) ||
-            !isset($data['password'])
-        ) {
-            $this->respondWithError(400, 'Missing required fields');
-            return;
-        }
-
-        try {
-            if (User::getByEmail($this->db, $data['email'])) {
-                $this->respondWithError(400, 'Email already registered');
-                return;
-            }
-             $organization = Organization::findById($this->db, $data['organization_id']);
-             if(!$organization){
-                $this->respondWithError(404,'Organization not found.');
-                return;
-            }
-            $user = new User(
-                $this->db,
-                null,
-                $data['email'],
-                password_hash($data['password'], PASSWORD_DEFAULT),
-                $data['first_name'],
-                $data['last_name'],
-            );
-
-            $user->save();
-             $userRole = new UserRole($this->db,
-             $user->getId(),
-             $data['organization_id'],
-             "Registered user");
-             $userRole->save();
-            $this->respondWithSuccess(['message' => 'User registered successfully']);
-        } catch (PDOException $e) {
-            $this->respondWithError(500, 'Database error during registration');
-        } catch (\Exception $e) {
-            $this->respondWithError(500, 'General error during registration.');
-        }
-    }
-
     public function logout(): void
     {
         $headers = getallheaders();

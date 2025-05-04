@@ -170,9 +170,9 @@ try {
         'login' => ['POST' => 'App\Controllers\AuthController@login'],
         'logout' => ['POST' => 'App\Controllers\AuthController@logout'],
         // Auth
-        'register' => ['POST' => 'App\Controllers\AuthController@register'],   
+        'register' => ['POST' => 'App\Controllers\UserController@store'],
         // Organizations
-        'organizations' => ['GET' => 'App\Controllers\OrganizationController@index','POST' => 'App\Controllers\OrganizationController@store'],
+        'organizations' => ['GET' => 'App\Controllers\OrganizationController@index', 'POST' => 'App\Controllers\OrganizationController@store'],
         'organizations/{id}' => ['PUT' => 'App\Controllers\OrganizationController@update','DELETE' => 'App\Controllers\OrganizationController@delete'],
         // Users
         'users' => ['GET' => 'App\Controllers\UserController@index', 'POST' => 'App\Controllers\UserController@store'], // User registration/creation
@@ -187,10 +187,11 @@ try {
         'users/{id}/admin' => [ // Set user as admin (Admin only)
              'PUT' => function ($db, $id) use ($logFilePath) { 
                  is_admin_middleware($db, $id, $logFilePath);
-                 $controller = new App\Controllers\UserController($db);
+                 $controller = new App\Controllers\UserController($db); 
                  $controller->setAdmin($id); // Assumes setAdmin method exists
              }
          ],
+          'users/{id}' => ['GET' => 'App\Controllers\UserController@show'],
         // Donation Events
         'donation-events' => ['GET' => 'App\Controllers\DonationEventController@index', 'POST' => 'App\Controllers\DonationEventController@store'],
         'donation-events/{id}' => ['PUT' => 'App\Controllers\DonationEventController@update', 'DELETE' => 'App\Controllers\DonationEventController@delete'],

@@ -1,8 +1,8 @@
-import { login, logout, register, getUserRole } from "./auth.js";
+import { login, logout, getUserRole } from "./auth.js";
 import { loadProfile } from "../donor/donor.js";
 import { loadDonationEvents, loadProcuredOrgans } from "../opo/opo.js";
 import { searchOrgans, loadOrganDetails, logTransplantOutcome } from "../transplant/transplant.js";
-import { loadOrganizations, loadAnalytics, loadAuditLogs, loadApiKeys } from "../admin/admin.js";
+import { loadOrganizations, loadAnalytics, loadAuditLogs, loadApiKeys, loadUsers } from "../admin/admin.js";
 
 const config = {
   API_BASE_URL: "http://localhost/OrganBankSystem/backend/api/",
@@ -83,7 +83,7 @@ async function loadPage(path) {
       case "analytics.html": loadAnalytics(); break;
       case "audit-logs.html": loadAuditLogs(); break;
       case "api-keys.html": loadApiKeys(); break;
-      case "users.html": loadOrganizations(); break;
+      case "users.html": loadUsers(); break;
     }
 
     if (userRole && path !== config.INDEX_PAGE && path !== config.LOGIN_PAGE && path !== config.REGISTER_PAGE) {
@@ -97,7 +97,7 @@ async function loadPage(path) {
   }
 }
 
-// Function to set up event listeners
+// Function to set up global event listeners
 function setupEventListeners() {
   const mainContent = document.getElementById("main-content");
 
@@ -106,14 +106,16 @@ function setupEventListeners() {
   if(logoutButton) logoutButton.addEventListener("click", logout);
 
   // Event listener for login form
-  mainContent.addEventListener("submit", function (event) {
+  mainContent.addEventListener("submit", async function (event) {
     const loginForm = event.target.closest("form#loginForm");
     if (loginForm) {
       event.preventDefault();
-      const email = loginForm.querySelector("#loginEmail").value;
-      const password = loginForm.querySelector("#loginPassword").value;
-      login(email, password);
+      // Get the form data.
+      const formData = new FormData(loginForm);
+      const data = Object.fromEntries(formData.entries());
+      await login(data.email, data.password);
     }
+    
   });
 
   // Event listener for register form
@@ -121,13 +123,68 @@ function setupEventListeners() {
     const registerForm = event.target.closest("form#registerForm");
     if (registerForm) {
       event.preventDefault();
-      const firstName = registerForm.querySelector("#registerFirstName").value;
-      const lastName = registerForm.querySelector("#registerLastName").value;
-      const email = registerForm.querySelector("#registerEmail").value;
-      const password = registerForm.querySelector("#registerPassword").value;
-      register(firstName, lastName, email, password);
+     await handleRegistration(registerForm);
     }
   });
+}
+
+// Function to get all organizations
+async function getOrganizations() {
+  try {
+    const response = await fetch(config.API_BASE_URL + "organizations");
+    const organizations = await response.json();
+    return organizations;
+  } catch (error) {
+    console.error("Error fetching organizations:", error);
+    return [];
+  }
+}
+
+// Function to get all roles
+async function getRoles() {
+  // For simplicity, we'll hardcode roles here. In a real application, you'd fetch these from the backend.
+  return ["System Administrator", "OPO Coordinator", "Transplant Coordinator", "Donor", "Organization Admin"];
+}
+
+// Function to handle user registration
+async function handleRegistration(registerForm) {
+  // Get the form data
+  const formData = new FormData(registerForm);
+  const data = Object.fromEntries(formData.entries());
+  
+  // Check if the user is a donor
+  if (data.isDonor === "on") {
+    data.organization_id = "None";
+    data.role_name = "Donor";
+  }
+  
+  // Remove the isDonor flag
+  delete data.isDonor;
+  
+  try {
+      // Send the data to the backend
+      const response = await fetch(config.API_BASE_URL + "users", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+      });
+
+      // Check if the response is ok
+      if (response.ok) {
+          alert("Registration successful!");
+           // Redirect to the login page.
+           loadPage(config.LOGIN_PAGE);
+      } else {
+          const errorData = await response.json();
+          alert("Registration failed: " + errorData.error);
+      }
+  } catch (error) {
+      console.error("Error during registration:", error);
+      alert("An error occurred during registration.");
+  }
+
 }
 
 // Initialize the application
@@ -137,3 +194,47 @@ window.addEventListener("DOMContentLoaded", () => {
   loadPage(path);
   setupEventListeners();
 });
+
+// Function to populate organizations dropdown
+async function populateOrganizations() {
+  const organizations = await getOrganizations();
+  const organizationSelect = document.getElementById("organization_id");
+
+  // Clear existing options
+  organizationSelect.innerHTML = "";
+
+  // Add default "None" option
+  const noneOption = document.createElement("option");
+  noneOption.value = "None";
+  noneOption.text = "None";
+  organizationSelect.appendChild(noneOption);
+
+  // Add fetched organizations
+  organizations.forEach(org => {
+    const option = document.createElement("option");
+    option.value = org.id;
+    option.text = org.name;
+    organizationSelect.appendChild(option);
+  });
+}
+
+// Function to populate roles dropdown
+async function populateRoles() {
+  const roles = await getRoles();
+  const roleSelect = document.getElementById("role_name");
+
+  // Clear existing options
+  roleSelect.innerHTML = "";
+
+  // Add fetched roles
+  roles.forEach(role => {
+    const option = document.createElement("option");
+    option.value = role;
+    option.text = role;
+    roleSelect.appendChild(option);
+  });
+}
+
+// Call the function to populate the organizations dropdown
+window.populateOrganizations = populateOrganizations;
+window.populateRoles = populateRoles;
